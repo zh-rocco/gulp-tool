@@ -32,6 +32,7 @@ npm run build
  - `index.html`
 - `dist/` 为最后输出目录（开发阶段不用管它）
 - `rev/` 为静态文件版本管理对照表存放目录（可以不用管它）
+
 #### 自定义目录:
 1. 开发目录默认为`src`,由`gulpfile.js`内的`DEVELOPMENT_PATH`变量定义；
 2. 必须给定项目目录，请修改`gulpfile.js`内的`PROJECT_NAME`变量；
