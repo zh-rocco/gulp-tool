@@ -1,4 +1,4 @@
-# <center>gulp构建工具</center>
+# gulp构建工具
 > * 支持LESS、SASS转CSS，支持CSS自动添加前缀；
 > * 支持JS校验、压缩；支持图片压缩；
 > * 支持静态资源版本管理；
@@ -6,6 +6,12 @@
 ---
 ### 构建过程:
 ``` bash
+# 全局安装gulp
+npm i -g gulp
+
+# shell 切换至工作目录（`gulpfile.js`存放目录）
+cd xxx/xx
+
 # 安装依赖
 npm i
 
@@ -20,6 +26,7 @@ npm run build
 ### 基本目录:
 #### 截图:
 ![目录结构](https://github.com/no-nothing/gulp/blob/master/README/catalogue.jpg) 
+
 #### 说明:
 - `src/` 为开发目录 
  - `embedded/` 为**'embedded'**项目目录
@@ -36,7 +43,6 @@ npm run build
 #### 自定义目录:
 1. 开发目录默认为`src`,由`gulpfile.js`内的`DEVELOPMENT_PATH`变量定义；
 2. 必须给定项目目录，请修改`gulpfile.js`内的`PROJECT_NAME`变量；
-![项目目录](xxxxx) 
 3. 不推荐自定义其他目录，否则要修改`gulpfile.js`；
 
 ---
