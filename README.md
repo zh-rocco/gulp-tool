@@ -49,11 +49,11 @@ npm run build
 ### gulp命令
 > `shell`下切换到工作目录（`gulpfile.js`存放目录），执行如下命令
 
-`gulp sprite`：合成雪碧图
-`gulp watch:less`：实时编译LESS
-`gulp watch:sass`：实时编译SASS
-`gulp watch:browser`：开发构建，等同 `npm run dev`
-`gulp build`：生产构建，等同 `npm run build`
+1. `gulp sprite`：合成雪碧图
+2. `gulp watch:less`：实时编译LESS
+3. `gulp watch:sass`：实时编译SASS
+4. `gulp watch:browser`：开发构建，等同 `npm run dev`
+5. `gulp build`：生产构建，等同 `npm run build`
 
 ---
 ### 其他:
