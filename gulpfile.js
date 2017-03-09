@@ -6,7 +6,7 @@ let gulp = require('gulp'),
     plumber = require('gulp-plumber'), //处理管道崩溃问题
     notify = require('gulp-notify'), //报错与不中断当前任务
     cache = require('gulp-cache'), //缓存管理，提高图片第二次压缩的速度
-    gulpIf = require('gulp-if'), //gulp内if判断
+    //gulpIf = require('gulp-if'), //gulp内if判断
     runSequence = require('run-sequence'),  // 顺序执行
     browserSync = require('browser-sync'), //浏览器自动刷新
 
@@ -50,7 +50,7 @@ const PROJECT_NAME = 'popup';
 const CSS_PREPROCESSOR = 'less';
 
 /* 全局路径管理 */
-let path = {
+let G_PATH = {
     /*开发环境*/
     dev: {
         base: DEVELOPMENT_PATH + '/' + PROJECT_NAME + '/',
@@ -63,7 +63,7 @@ let path = {
         image: DEVELOPMENT_PATH + '/' + PROJECT_NAME + '/img/',
         sprite: DEVELOPMENT_PATH + '/' + PROJECT_NAME + '/sprite/',
         fonts: DEVELOPMENT_PATH + '/' + PROJECT_NAME + '/fonts/',
-        lib: DEVELOPMENT_PATH + '/' + PROJECT_NAME + '/lib/',
+        lib: DEVELOPMENT_PATH + '/' + PROJECT_NAME + '/lib/'
     },
     /*发布环境*/
     dist: {
@@ -86,17 +86,17 @@ let path = {
 /* ----- 开发阶段 ----- */
 /*
  * 合成雪碧图
- * 需要合并的PNG文件放在 path.dev.sprite 目录下
- * 合并后的PNG和生成的CSS文件输出到 path.dev.sprite/merge 目录
+ * 需要合并的PNG文件放在 G_PATH.dev.sprite 目录下
+ * 合并后的PNG和生成的CSS文件输出到 G_PATH.dev.sprite/merge 目录
  * */
 gulp.task('sprite', function () {
-    return gulp.src(path.dev.sprite + '**/*.png')
+    return gulp.src(G_PATH.dev.sprite + '**/*.png')
         .pipe(spriteSmith({
             imgName: 'sprite.png',
             cssName: 'sprite.css',
             padding: 5
         }))
-        .pipe(gulp.dest(path.dev.sprite + 'merge'));
+        .pipe(gulp.dest(G_PATH.dev.sprite + 'merge'));
 });
 
 /* 静态服务器 */
@@ -110,7 +110,7 @@ gulp.task('browser-sync', function () {
             }
         },
         server: {
-            baseDir: path.dev.base,
+            baseDir: G_PATH.dev.base,
             /*静态服务器打开的首页面*/
             index: 'index.html'
         }
@@ -128,7 +128,7 @@ let optionsPrefixer = {
 };
 /* LESS --> CSS */
 gulp.task('less', function () {
-    return gulp.src([path.dev.less + '*.less', '!src' + path.dev.less + 'base.less'])
+    return gulp.src([G_PATH.dev.less + '*.less', '!src' + G_PATH.dev.less + 'base.less'])
     /*如果less文件中有语法错误，用plumber保证任务不会停止*/
         .pipe(plumber({
             errorHandler: notify.onError('Error:<%= error.message %>;')
@@ -136,36 +136,36 @@ gulp.task('less', function () {
         .pipe(less())
         .pipe(base64(optionsBase64))
         .pipe(autoprefixer(optionsPrefixer))
-        .pipe(gulp.dest(path.dev.css));
+        .pipe(gulp.dest(G_PATH.dev.css));
 });
 /* SASS --> CSS */
 gulp.task('sass', function () {
-    return gulp.src([path.dev.sass + '*.scss', '!src' + path.dev.sass + 'base.scss'])
+    return gulp.src([G_PATH.dev.sass + '*.scss', '!src' + G_PATH.dev.sass + 'base.scss'])
         .pipe(sass.sync().on('error', sass.logError))
         .pipe(base64(optionsBase64))
         .pipe(autoprefixer(optionsPrefixer))
-        .pipe(gulp.dest(path.dev.css));
+        .pipe(gulp.dest(G_PATH.dev.css));
 });
 
 /* 监听less文件夹下的*.less文件变化，然后执行less命令 */
 gulp.task('watch:less', ['less'], function () {
-    gulp.watch(path.dev.less + '*.less', ['less']);
+    gulp.watch(G_PATH.dev.less + '*.less', ['less']);
 });
 
 /* 监听sass文件夹下的*.scss文件变化，然后执行sass命令 */
 gulp.task('watch:sass', ['sass'], function () {
-    gulp.watch(path.dev.sass + '*.scss', ['sass']);
+    gulp.watch(G_PATH.dev.sass + '*.scss', ['sass']);
 });
 
 /*监听开发目录下的所有*.less *.scss *.css *.js *.html文件变化，然后自动刷新浏览器*/
 gulp.task('watch:browser', [CSS_PREPROCESSOR, 'browser-sync'], function () {
     /*调用上面定义的less或sass*/
-    gulp.watch(path.dev[CSS_PREPROCESSOR] + '/*.' + CSS_PREPROCESSOR.replace('sass', 'scss'), [CSS_PREPROCESSOR]);
+    gulp.watch(G_PATH.dev[CSS_PREPROCESSOR] + '/*.' + CSS_PREPROCESSOR.replace('sass', 'scss'), [CSS_PREPROCESSOR]);
     /*通过 browserSync 控制浏览器自动刷新*/
     let reload = browserSync.reload;
-    gulp.watch(path.dev.css + '*.css').on('change', reload);
-    gulp.watch(path.dev.js + '*.js').on('change', reload);
-    gulp.watch(path.dev.base + '*.html').on('change', reload);
+    gulp.watch(G_PATH.dev.css + '*.css').on('change', reload);
+    gulp.watch(G_PATH.dev.js + '*.js').on('change', reload);
+    gulp.watch(G_PATH.dev.base + '*.html').on('change', reload);
 });
 
 
@@ -183,9 +183,9 @@ gulp.task('image', function () {
             imageminJpegRecompress()
         ]
     };
-    return gulp.src(path.dev.image + '**/*.+(png|jpg|jpeg|gif|svg)')
+    return gulp.src(G_PATH.dev.image + '**/*.+(png|jpg|jpeg|gif|svg)')
         .pipe(cache(imagemin(optionsImagemin)))
-        .pipe(gulp.dest(path.dist.image));
+        .pipe(gulp.dest(G_PATH.dist.image));
 });
 
 /*
@@ -193,9 +193,9 @@ gulp.task('image', function () {
  * 如：fonts、lib等
  * */
 gulp.task('copy', function () {
-    let sourceFiles = [path.dev.fonts + '**/*', path.dev.lib + '**/*'];
-    let destination = path.dist.base;
-    return gulp.src(sourceFiles, {base: path.dev.base})
+    let sourceFiles = [G_PATH.dev.fonts + '**/*', G_PATH.dev.lib + '**/*'];
+    let destination = G_PATH.dist.base;
+    return gulp.src(sourceFiles, {base: G_PATH.dev.base})
         .pipe(gulp.dest(destination));
 });
 
@@ -205,24 +205,24 @@ gulp.task('css', function () {
         compatibility: '*',   //保留ie7及以下兼容写法 类型：String 默认：''or'*' [启用兼容模式； 'ie7'：IE7兼容模式，'ie8'：IE8兼容模式，'*'：IE9+兼容模式]
         keepSpecialComments: '*'    //保留所有特殊前缀 当你用autoprefixer生成的浏览器前缀，如果不加这个参数，有可能将会删除你的部分前缀
     };
-    return gulp.src(path.dev.css + '*.css')
+    return gulp.src(G_PATH.dev.css + '*.css')
         .pipe(cssmin(optionsCssmin))
         .pipe(cssUrlVersion()) //给css文件里引用文件加版本号（文件MD5）
         .pipe(rev())
-        .pipe(gulp.dest(path.dist.css))
+        .pipe(gulp.dest(G_PATH.dist.css))
         .pipe(rev.manifest())
-        .pipe(gulp.dest(path.rev.css));
+        .pipe(gulp.dest(G_PATH.rev.css));
 });
 
 /* 压缩JS、增加版本号 */
 gulp.task('js', function () {
-    return gulp.src(path.dev.js + '*.js')
+    return gulp.src(G_PATH.dev.js + '*.js')
         .pipe(jshint())
         .pipe(uglify())
         .pipe(rev())
-        .pipe(gulp.dest(path.dist.js))
+        .pipe(gulp.dest(G_PATH.dist.js))
         .pipe(rev.manifest())
-        .pipe(gulp.dest(path.rev.js));
+        .pipe(gulp.dest(G_PATH.rev.js));
 });
 
 /* 压缩HTML、CSS、JS更改文件名 */
@@ -238,10 +238,10 @@ gulp.task('html', function () {
         minifyJS: true, //压缩页面JS
         minifyURLs: true //压缩页面内URL
     };
-    return gulp.src([path.rev.base + '**/*.json', path.dev.base + '*.html'])
+    return gulp.src([G_PATH.rev.base + '**/*.json', G_PATH.dev.base + '*.html'])
         .pipe(revCollector())
         .pipe(htmlmin(optionsHtmlmin))
-        .pipe(gulp.dest(path.dist.base));
+        .pipe(gulp.dest(G_PATH.dist.base));
 });
 
 /* 执行build前清理发布文件夹 */
@@ -249,11 +249,11 @@ gulp.task('clean', function () {
     //del(PRODUCTION_PATH);
     //return cache.clearAll();
     cache.clearAll();
-    return gulp.src([path.dist.base, path.rev.base], {read: false})
+    return gulp.src([G_PATH.dist.base, G_PATH.rev.base], {read: false})
         .pipe(clean())
 });
 gulp.task('clean:dist', function () {
-    del([path.dist.base + '**/*', '!' + path.dist.image, '!' + path.dist.image + '**/*']);
+    del([G_PATH.dist.base + '**/*', '!' + G_PATH.dist.image, '!' + G_PATH.dist.image + '**/*']);
 });
 
 /* 发布任务 */

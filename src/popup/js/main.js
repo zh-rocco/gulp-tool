@@ -1,13 +1,12 @@
-var myPopup = new Popup();
+let myPopup = new Popup();
 
 myPopup.show('confirm', {
-    maskColor: 'transparent',
-    text: 'Sure?',
+    text: '点击按钮关闭弹窗。',
     buttonReverse: true,
     success: function () {
-        alert('yes');
+        alert('您点击了 确认');
     },
     failure: function () {
-        alert('no');
+        alert('您点击了 取消');
     }
 });

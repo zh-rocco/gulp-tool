@@ -1,1 +1,0 @@
-var myPopup=new Popup;myPopup.show("confirm",{maskColor:"transparent",text:"Sure?",buttonReverse:!0,success:function(){alert("yes")},failure:function(){alert("no")}});
