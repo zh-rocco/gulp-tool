@@ -34,7 +34,7 @@ let gulp = require('gulp'),
 
     /* 版本管理 */
     cssUrlVersion = require('gulp-make-css-url-version'), //为CSS文件内的URL进行版本管理
-    rev = require('gulp-rev'), //版本管理
+    rev = require('gulp-rev'), //增加版本号
     revCollector = require('gulp-rev-collector'); //配合gulp-rev使用
 
 
@@ -46,7 +46,7 @@ const PRODUCTION_PATH = 'dist';
 const VERSION_PATH = 'rev';
 /* 定义项目名称 */
 const PROJECT_NAME = 'popup';
-/* 定义CSS预处理器，less或者sass */
+/* 定义CSS预处理器，less或者sass。注意：此变量在task里有引用，不推荐修改变量名 */
 const CSS_PREPROCESSOR = 'less';
 
 /* 全局路径管理 */
@@ -92,6 +92,7 @@ let G_PATH = {
 gulp.task('sprite', function () {
     return gulp.src(G_PATH.dev.sprite + '**/*.png')
         .pipe(spriteSmith({
+            /*详细配置：https://www.npmjs.com/package/gulp.spritesmith*/
             imgName: 'sprite.png',
             cssName: 'sprite.css',
             padding: 5
@@ -102,6 +103,7 @@ gulp.task('sprite', function () {
 /* 静态服务器 */
 gulp.task('browser-sync', function () {
     browserSync.init({
+        /*详细配置：https://browsersync.io/docs/options*/
         port: 3333,
         ui: {
             port: 3334,
@@ -113,17 +115,21 @@ gulp.task('browser-sync', function () {
             baseDir: G_PATH.dev.base,
             /*静态服务器打开的首页面*/
             index: 'index.html'
-        }
+        },
+        /*禁止更新页面时浏览器窗口右上角的提示*/
+        notify: false
     });
 });
 
 /* 编译CSS */
 let optionsBase64 = {
+    /*详细配置：https://www.npmjs.com/package/gulp-base64*/
     extensions: ['png'],
     maxImageSize: 5 * 1024, //小于5kb
     debug: false
 };
 let optionsPrefixer = {
+    /*详细配置：https://github.com/postcss/autoprefixer#options*/
     browsers: ['Android >= 4.0', 'iOS >= 7', 'ie >= 9']
 };
 /* LESS --> CSS */
@@ -177,14 +183,14 @@ gulp.task('watch:browser', [CSS_PREPROCESSOR, 'browser-sync'], function () {
 /* ----- 发布阶段 ----- */
 /* 图片压缩 */
 gulp.task('image', function () {
-    let optionsImagemin = {
-        use: [
-            imageminPngquant(),
-            imageminJpegRecompress()
-        ]
-    };
+    /*附加插件，修复jpeg图片无法压缩，插件需要以数组的形式传入，不可使用对象*/
+    /*详情请阅读gulp-imagemin源码：https://github.com/sindresorhus/gulp-imagemin/blob/master/index.js*/
+    let pluginsImagemin = [
+        imageminPngquant(),
+        imageminJpegRecompress()
+    ];
     return gulp.src(G_PATH.dev.image + '**/*.+(png|jpg|jpeg|gif|svg)')
-        .pipe(cache(imagemin(optionsImagemin)))
+        .pipe(cache(imagemin(pluginsImagemin)))
         .pipe(gulp.dest(G_PATH.dist.image));
 });
 
@@ -202,8 +208,9 @@ gulp.task('copy', function () {
 /* 压缩CSS、增加版本号 */
 gulp.task('css', function () {
     let optionsCssmin = {
-        compatibility: '*',   //保留ie7及以下兼容写法 类型：String 默认：''or'*' [启用兼容模式； 'ie7'：IE7兼容模式，'ie8'：IE8兼容模式，'*'：IE9+兼容模式]
-        keepSpecialComments: '*'    //保留所有特殊前缀 当你用autoprefixer生成的浏览器前缀，如果不加这个参数，有可能将会删除你的部分前缀
+        /*详细配置：https://github.com/jakubpawlowicz/clean-css*/
+        compatibility: '*', //类型：String 默认：'*' [启用兼容模式； 'ie7'：IE7+兼容模式，'ie8'：IE8+兼容模式，'ie9'：IE9+兼容模式，'*'：IE10+兼容模式]
+        specialComments: '*' //保留所有特殊前缀 当你用autoprefixer生成的浏览器前缀，如果不加这个参数，有可能将会删除你的部分前缀
     };
     return gulp.src(G_PATH.dev.css + '*.css')
         .pipe(cssmin(optionsCssmin))
@@ -228,6 +235,7 @@ gulp.task('js', function () {
 /* 压缩HTML、CSS、JS更改文件名 */
 gulp.task('html', function () {
     let optionsHtmlmin = {
+        /*详细配置：https://github.com/kangax/html-minifier*/
         collapseWhitespace: true, //压缩HTML
         collapseBooleanAttributes: true, //省略布尔属性的值 <input checked="true"/> ==> <input checked />
         removeComments: true, //清除HTML注释

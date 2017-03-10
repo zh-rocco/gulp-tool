@@ -1,4 +1,4 @@
-let myPopup = new Popup();
+var myPopup = new Popup();
 
 myPopup.show('confirm', {
     text: '点击按钮关闭弹窗。',

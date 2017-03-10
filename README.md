@@ -59,7 +59,9 @@ npm run build
 
 ---
 ## 其他:
-`gulpfile.js`内有详细注释。
+1. `gulpfile.js`内有详细注释。
+2. 已修复无法压缩`jpg jpeg`图片的BUG。
+ - 阅读`gulp-imagemin`源码后发现这个插件只能传入`plugins`(Array Object)，不可传入`options`(Original Object)。
 
 ---
 ## 参考资料：
