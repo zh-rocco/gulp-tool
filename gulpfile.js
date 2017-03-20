@@ -223,9 +223,14 @@ gulp.task('css', function () {
 
 /* 压缩JS、增加版本号 */
 gulp.task('js', function () {
+    let optionsUglify = {
+        /*删除 console 语句*/
+        drop_debugger: false
+    };
+
     return gulp.src(G_PATH.dev.js + '*.js')
         .pipe(jshint())
-        .pipe(uglify())
+        .pipe(uglify(optionsUglify))
         .pipe(rev())
         .pipe(gulp.dest(G_PATH.dist.js))
         .pipe(rev.manifest())
