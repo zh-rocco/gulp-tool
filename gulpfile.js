@@ -1,27 +1,25 @@
-/* 定义开发目录 */
-const DEVELOPMENT_PATH = 'src';
-/* 定义生产目录 */
-const PRODUCTION_PATH = 'dist';
-/* 定义版本对照表存放目录 */
-const VERSION_PATH = 'rev';
-/* 定义CSS预处理器，less或者sass。注意：此变量在task里有引用，不推荐修改变量名 */
-const CSS_PREPROCESSOR = 'sass';
-/* 是否开启 px -> rem，配合 flexible.js 使用,*/
-const PX_TO_REM = true;
+const Config = require('./config/index.js');
+
 /* 定义项目名称 */
-const PROJECT_NAME = 'pay';
+const PROJECT_NAME = Config.projectName;
+/* 定义CSS预处理器，less或者sass。注意：此变量在task里有引用，不要修改变量名 */
+const CSS_PREPROCESSOR = Config.cssPreprocessor;
+/* 定义开发目录 */
+const DEVELOPMENT_PATH = Config.developmentPath || 'src';
+/* 定义生产目录 */
+const PRODUCTION_PATH = Config.productionPath || 'dist';
+/* 定义版本对照表存放目录 */
+const VERSION_PATH = Config.versionPath || 'rev';
 
 /* 全局路径管理 */
-let G_PATH = {
+const G_PATH = {
   /*开发环境*/
   dev: {
     base: DEVELOPMENT_PATH + '/' + PROJECT_NAME + '/',
-    html: DEVELOPMENT_PATH + '/' + PROJECT_NAME + '/',
     less: DEVELOPMENT_PATH + '/' + PROJECT_NAME + '/less/',
     sass: DEVELOPMENT_PATH + '/' + PROJECT_NAME + '/sass/',
     css: DEVELOPMENT_PATH + '/' + PROJECT_NAME + '/css/',
     js: DEVELOPMENT_PATH + '/' + PROJECT_NAME + '/js/',
-    /*uploads*/
     image: DEVELOPMENT_PATH + '/' + PROJECT_NAME + '/img/',
     sprite: DEVELOPMENT_PATH + '/' + PROJECT_NAME + '/sprite/',
     fonts: DEVELOPMENT_PATH + '/' + PROJECT_NAME + '/fonts/',
@@ -30,7 +28,6 @@ let G_PATH = {
   /*发布环境*/
   dist: {
     base: PRODUCTION_PATH + '/' + PROJECT_NAME + '/',
-    html: PRODUCTION_PATH + '/' + PROJECT_NAME + '/',
     css: PRODUCTION_PATH + '/' + PROJECT_NAME + '/css/',
     js: PRODUCTION_PATH + '/' + PROJECT_NAME + '/js/',
     image: PRODUCTION_PATH + '/' + PROJECT_NAME + '/img/',
@@ -49,14 +46,13 @@ let G_PATH = {
 /* 插件列表 */
 let gulp = require('gulp'),
   clean = require('gulp-clean'), //删除文件夹
-  del = require('del'), //删除文件夹
   concat = require('gulp-concat'), //合并文件
   rename = require('gulp-rename'), //改名
   plumber = require('gulp-plumber'), //处理管道崩溃问题
   notify = require('gulp-notify'), //报错与不中断当前任务
   cache = require('gulp-cache'), //缓存管理，提高图片第二次压缩的速度
-  gulpIf = require('gulp-if'), //gulp内if判断
-  runSequence = require('run-sequence'),  // 顺序执行
+  gulpIf = require('gulp-if'), //gulp 内 if 判断
+  runSequence = require('run-sequence'),  //顺序执行
   browserSync = require('browser-sync'), //浏览器自动刷新
 
   /* HTML处理 */
@@ -67,8 +63,8 @@ let gulp = require('gulp'),
   sass = require('gulp-sass'), //SASS --> CSS
   autoprefixer = require('gulp-autoprefixer'), //为CSS添加浏览器私有前缀
   cssmin = require('gulp-clean-css'), //压缩CSS
-  postcss = require('gulp-postcss'),
-  px2rem = require('postcss-px2rem'),
+  postcss = require('gulp-postcss'), //postcss-px2rem 依赖
+  px2rem = require('postcss-px2rem'), //px -> rem，配合 flexible.js 使用
 
   /* JS处理 */
   jshint = require('gulp-jshint'), //JS校验，依赖jshint
@@ -76,17 +72,17 @@ let gulp = require('gulp'),
   uglify = require('gulp-uglify'), //压缩JS
 
   /* 图片处理 */
-  base64 = require('gulp-base64'), //图片base64转码
+  base64 = require('gulp-base64'), //图片 base64 转码
   imagemin = require('gulp-imagemin'), //压缩图片
-  imageminPngquant = require('imagemin-pngquant'),
-  imageminJpegRecompress = require('imagemin-jpeg-recompress'),
+  imageminPngquant = require('imagemin-pngquant'), //imagemin 插件
+  imageminJpegRecompress = require('imagemin-jpeg-recompress'), //imagemin 插件
 
   spriteSmith = require('gulp.spritesmith'), //合成雪碧图
 
   /* 版本管理 */
   //cssUrlVersion = require('gulp-make-css-url-version'), //为CSS文件内的URL进行版本管理
   rev = require('gulp-rev'), //增加版本号
-  revCollector = require('gulp-rev-collector'); //配合gulp-rev使用
+  revCollector = require('gulp-rev-collector'); //配合 gulp-rev 使用
 
 
 /* ----- 开发阶段 ----- */
@@ -107,56 +103,31 @@ gulp.task('sprite', () => {
 });
 
 /* 静态服务器 */
+let browserSyncOpt = Object.assign(Config.browserSync, {server: {baseDir: G_PATH.dev.base}});
 gulp.task('browser-sync', () => {
-  browserSync.init({
-    /*详细配置：https://browsersync.io/docs/options*/
-    port: 3333,
-    ui: {
-      port: 3334,
-      weinre: {
-        port: 3335
-      }
-    },
-    server: {
-      baseDir: G_PATH.dev.base,
-      /*静态服务器打开的首页面*/
-      index: 'index.html'
-    },
-    /*禁止更新页面时浏览器窗口右上角的提示*/
-    notify: false
-  });
+  browserSync.init(browserSyncOpt);
 });
 
 /* 编译CSS */
-let optionsBase64 = {
-  /*详细配置：https://www.npmjs.com/package/gulp-base64*/
-  extensions: ['png'],
-  maxImageSize: 5 * 1024, //小于5kb
-  debug: false
-};
-let optionsPrefixer = {
-  /*详细配置：https://github.com/postcss/autoprefixer#options*/
-  browsers: ['Android >= 4.0', 'iOS >= 7']
-};
-let processors = [px2rem({remUnit: 75})];
+let processors = [px2rem({remUnit: Config.optionsPx2rem.remUnit})];
 /* LESS --> CSS */
 gulp.task('less', () => {
   return gulp.src([G_PATH.dev.less + '*.less', '!' + G_PATH.dev.less + '_' + '*.less'])
   /*如果less文件中有语法错误，用plumber保证任务不会停止*/
     .pipe(plumber())
     .pipe(less())
-    .pipe(gulpIf(PX_TO_REM, postcss(processors)))
-    .pipe(base64(optionsBase64))
-    .pipe(autoprefixer(optionsPrefixer))
+    .pipe(gulpIf(Config.optionsPx2rem.open, postcss(processors)))
+    .pipe(base64(Config.optionsBase64))
+    .pipe(autoprefixer(Config.optionsPrefixer))
     .pipe(gulp.dest(G_PATH.dev.css));
 });
 /* SASS --> CSS */
 gulp.task('sass', function () {
-  return gulp.src([G_PATH.dev.sass + '*.scss', '!src' + G_PATH.dev.sass + '_' + '*.scss'])
+  return gulp.src([G_PATH.dev.sass + '*.scss', '!src' + G_PATH.dev.sass + 'base.scss'])
     .pipe(sass.sync().on('error', sass.logError))
-    .pipe(gulpIf(PX_TO_REM, postcss(processors)))
-    .pipe(base64(optionsBase64))
-    .pipe(autoprefixer(optionsPrefixer))
+    .pipe(gulpIf(Config.optionsPx2rem.open, postcss(processors)))
+    .pipe(base64(Config.optionsBase64))
+    .pipe(autoprefixer(Config.optionsPrefixer))
     .pipe(gulp.dest(G_PATH.dev.css));
 });
 
@@ -216,14 +187,9 @@ gulp.task('copy', () => {
 
 /* 压缩CSS、增加版本号 */
 gulp.task('css', () => {
-  let optionsCssmin = {
-    /*详细配置：https://github.com/jakubpawlowicz/clean-css*/
-    compatibility: '*', //类型：String 默认：'*' [启用兼容模式； 'ie7'：IE7+兼容模式，'ie8'：IE8+兼容模式，'ie9'：IE9+兼容模式，'*'：IE10+兼容模式]
-    specialComments: '*' //保留所有特殊前缀 当你用autoprefixer生成的浏览器前缀，如果不加这个参数，有可能将会删除你的部分前缀
-  };
   return gulp.src([G_PATH.rev.base + '**/*.json', G_PATH.dev.css + '*.css'])
     .pipe(revCollector())
-    .pipe(cssmin(optionsCssmin))
+    .pipe(cssmin(Config.optionsCssmin))
     //.pipe(cssUrlVersion()) //给css文件里引用文件加版本号（文件MD5）
     .pipe(rev())
     .pipe(gulp.dest(G_PATH.dist.css))
@@ -245,40 +211,36 @@ gulp.task('js', () => {
 
 /* 压缩HTML、CSS、JS更改文件名 */
 gulp.task('html', () => {
-  let optionsHtmlmin = {
-    /*详细配置：https://github.com/kangax/html-minifier*/
-    collapseWhitespace: true, //压缩HTML
-    collapseBooleanAttributes: true, //省略布尔属性的值 <input checked="true"/> ==> <input checked />
-    removeComments: true, //清除HTML注释
-    removeEmptyAttributes: true, //删除所有空格作属性值 <input id="" /> ==> <input />
-    removeScriptTypeAttributes: true, //删除<script>的type="text/javascript"
-    removeStyleLinkTypeAttributes: true, //删除<style>和<link>的type="text/css"
-    minifyCSS: true, //压缩页面CSS
-    minifyJS: true, //压缩页面JS
-    minifyURLs: true //压缩页面内URL
-  };
   return gulp.src([G_PATH.rev.base + '**/*.json', G_PATH.dev.base + '*.html'])
     .pipe(revCollector())
-    .pipe(htmlmin(optionsHtmlmin))
+    .pipe(htmlmin(Config.optionsHtmlmin))
     .pipe(gulp.dest(G_PATH.dist.base));
 });
 
 /* 执行build前清理发布文件夹 */
 gulp.task('clean', () => {
-  //del(PRODUCTION_PATH);
-  //return cache.clearAll();
-  cache.clearAll();
   return gulp.src([G_PATH.dist.base, G_PATH.rev.base], {read: false})
     .pipe(clean())
 });
-gulp.task('clean:dist', () => {
-  del([G_PATH.dist.base + '**/*', '!' + G_PATH.dist.image, '!' + G_PATH.dist.image + '**/*']);
+/* 同时删除图片缓存 */
+gulp.task('clean:all', () => {
+  cache.clearAll();
+  return gulp.src([G_PATH.dist.base, G_PATH.rev.base], {read: false})
+    .pipe(clean())
 });
 
 /* 发布任务 */
 gulp.task('build', () => {
   runSequence(
     'clean',
+    [CSS_PREPROCESSOR, 'image', 'copy'],
+    ['css', 'js'],
+    'html')
+});
+
+gulp.task('build:clean', () => {
+  runSequence(
+    'clean:all',
     [CSS_PREPROCESSOR, 'image', 'copy'],
     ['css', 'js'],
     'html')
