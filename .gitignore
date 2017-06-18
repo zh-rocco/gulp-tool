@@ -1,4 +1,8 @@
-.git
-.idea
-node_modules
+.idea/
+node_modules/
+dist/
+rev/
+src/
+!src/demo/
+!src/pay/
 npm-debug.log
