@@ -3,7 +3,4 @@
 node_modules/
 dist/
 rev/
-src/
-!src/demo/
-!src/pay/
 npm-debug.log

@@ -1,4 +1,5 @@
+/* 详细配置：https://github.com/postcss/autoprefixer#options */
+
 module.exports = {
-  /*详细配置：https://github.com/postcss/autoprefixer#options*/
-  browsers: ['Android >= 4.0', 'iOS >= 7']
+    browsers: ['Android >= 4.4', 'iOS >= 9']
 };

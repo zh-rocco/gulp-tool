@@ -1,0 +1,115 @@
+input {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    vertical-align: middle;
+    font-weight: normal;
+    outline: none;
+    border: none;
+    -webkit-appearance: none;
+    user-select: none;
+}
+
+button {
+    padding: 0;
+    border: none;
+    outline: none;
+    -webkit-appearance: none;
+    font-weight: normal;
+    letter-spacing: 1px;
+    user-select: none;
+}
+
+/* 闭合浮动 */
+.clear-fix:before, .clear-fix:after {
+    display: table;
+    content: '';
+}
+
+.clear-fix:after {
+    clear: both;
+}
+
+/* 文字超出隐藏 */
+@mixin ellipsis {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+/* 1px 线 */
+@mixin hairline {
+    position: relative;
+    &:before, &:after {
+        display: block;
+        content: '';
+        position: absolute;
+        left: 0;
+        width: 100%;
+        height: 2px; /*px*/
+        background-color: #d9d9d9;
+        transform: scaleY(.5);
+        z-index: 20;
+    }
+    &:before {
+        top: 0;
+    }
+    &:after {
+        bottom: 0;
+    }
+}
+
+@mixin list-item {
+    display: flex;
+    align-items: center;
+    position: relative;
+    background-color: #fff;
+    .icon {
+        display: block;
+        height: 100%;
+    }
+    .content {
+        flex: 1 1 auto;
+    }
+    .arrow {
+        display: block;
+        width: 60px;
+        height: 100%;
+        background: 15px center / auto 30px no-repeat;
+    }
+}
+
+.ellipsis {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+/* 分割线 */
+.cutting-line {
+    right: 0;
+    bottom: -16px; /*px*/
+    width: 96%;
+    height: 32px; /*px*/
+    @include hairline;
+    position: absolute;
+    &:before {
+        content: none;
+    }
+    &:after {
+        bottom: 50%;
+    }
+}
+
+/* 按钮 */
+.btn-wrap {
+    user-select: none;
+    .btn {
+        display: block;
+        width: 100%;
+        color: #fff;
+        text-align: center;
+    }
+}
+
+
