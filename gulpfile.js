@@ -1,41 +1,7 @@
 const
-    Config = require('./config/index.js'),
-    PROJECT_NAME = Config.projectName,
-    CSS_PREPROCESSOR = Config.cssPreprocessor === 'less' ? 'less' : 'sass',
-    DEVELOPMENT_PATH = Config.developmentPath || 'src',
-    PRODUCTION_PATH = Config.productionPath || 'dist',
-    VERSION_PATH = Config.versionPath || 'rev',
-    /* 全局路径管理 */
-    G_PATH = {
-        /*开发环境*/
-        dev: {
-            base: DEVELOPMENT_PATH + '/' + PROJECT_NAME + '/',
-            less: DEVELOPMENT_PATH + '/' + PROJECT_NAME + '/less/',
-            sass: DEVELOPMENT_PATH + '/' + PROJECT_NAME + '/sass/',
-            css: DEVELOPMENT_PATH + '/' + PROJECT_NAME + '/css/',
-            image: DEVELOPMENT_PATH + '/' + PROJECT_NAME + '/img/',
-            sprite: DEVELOPMENT_PATH + '/' + PROJECT_NAME + '/sprite/',
-            js: DEVELOPMENT_PATH + '/' + PROJECT_NAME + '/js/',
-            lib: DEVELOPMENT_PATH + '/' + PROJECT_NAME + '/lib/',
-            assets: DEVELOPMENT_PATH + '/' + PROJECT_NAME + '/assets/'
-        },
-        /*发布环境*/
-        dist: {
-            base: PRODUCTION_PATH + '/' + PROJECT_NAME + '/',
-            css: PRODUCTION_PATH + '/' + PROJECT_NAME + '/css/',
-            image: PRODUCTION_PATH + '/' + PROJECT_NAME + '/img/',
-            js: PRODUCTION_PATH + '/' + PROJECT_NAME + '/js/',
-            lib: PRODUCTION_PATH + '/' + PROJECT_NAME + '/lib/',
-            assets: PRODUCTION_PATH + '/' + PROJECT_NAME + '/assets/'
-        },
-        /*版本对照表存放目录*/
-        rev: {
-            base: VERSION_PATH + '/' + PROJECT_NAME + '/',
-            css: VERSION_PATH + '/' + PROJECT_NAME + '/css/',
-            js: VERSION_PATH + '/' + PROJECT_NAME + '/js/',
-            image: VERSION_PATH + '/' + PROJECT_NAME + '/image/'
-        }
-    };
+    Config = require('./config/index'),
+    Utils = require('./config/utils'),
+    PROJECT_NAME = Config.projectName;
 
 /* 插件列表 */
 let gulp = require('gulp'),
@@ -43,17 +9,16 @@ let gulp = require('gulp'),
     concat = require('gulp-concat'), //合并文件
     rename = require('gulp-rename'), //改名
     plumber = require('gulp-plumber'), //处理管道崩溃问题
-    //notify = require('gulp-notify'), //报错与不中断当前任务
     cache = require('gulp-cache'), //缓存管理，提高图片第二次压缩的速度
     gulpIf = require('gulp-if'), //gulp 内 if 判断
     runSequence = require('run-sequence'),  //顺序执行
     browserSync = require('browser-sync'), //浏览器自动刷新
+    pathReplace = require('gulp-replace-task'), //字符串替换
 
     /* HTML处理 */
     htmlmin = require('gulp-htmlmin'), //压缩HTML
 
     /* CSS处理 */
-    less = require('gulp-less'), //LESS --> CSS
     sass = require('gulp-sass'), //SASS --> CSS
     autoprefixer = require('gulp-autoprefixer'), //为CSS添加浏览器私有前缀
     cssmin = require('gulp-clean-css'), //压缩CSS
@@ -73,7 +38,7 @@ let gulp = require('gulp'),
     spriteSmith = require('gulp.spritesmith'), //合成雪碧图
 
     /* 版本管理 */
-    //cssUrlVersion = require('gulp-make-css-url-version'), //为CSS文件内的URL进行版本管理
+    cssUrlVersion = require('gulp-make-css-url-version'), //为CSS文件内的URL进行版本管理
     rev = require('gulp-rev'), //增加版本号
     revCollector = require('gulp-rev-collector'); //配合 gulp-rev 使用
 
@@ -81,66 +46,49 @@ let gulp = require('gulp'),
 /* ----- 开发阶段 ----- */
 /*
  * 合成雪碧图
- * 需要合并的PNG文件放在 G_PATH.dev.sprite 目录下
- * 合并后的PNG和生成的CSS文件输出到 G_PATH.dev.sprite/merge 目录
+ * 需要合并的PNG文件放在 ${PROJECT_NAME}/sprite 目录下
+ * 合并后的PNG和生成的CSS文件输出到 ${PROJECT_NAME}/sprite/merge 目录
  * */
 gulp.task('sprite', () => {
-    return gulp.src(`${G_PATH.dev.sprite}**/*.png`)
+    return gulp.src(`src/${PROJECT_NAME}/**/*.png`, {base: `src`})
         .pipe(spriteSmith({
             /*详细配置：https://www.npmjs.com/package/gulp.spritesmith*/
             imgName: 'sprite.png',
             cssName: 'sprite.css',
             padding: 5
         }))
-        .pipe(gulp.dest(`${G_PATH.dev.sprite}merge`));
+        .pipe(gulp.dest(`src/${PROJECT_NAME}/merge`));
 });
 
 /* 静态服务器 */
-let browserSyncOpt = Object.assign(Config.browserSync, {server: {baseDir: G_PATH.dev.base}});
+let browserSyncOpt = Object.assign(Config.browserSync, {server: {baseDir: `src/${PROJECT_NAME}/`}});
 gulp.task('browser-sync', () => {
     browserSync.init(browserSyncOpt);
 });
 
-/* 编译CSS */
-let processors = [px2rem({remUnit: Config.optionsPx2rem.remUnit})];
-/* LESS --> CSS */
-gulp.task('less', () => {
-    return gulp.src([`${G_PATH.dev.less}*.less`, `!${G_PATH.dev.less}_*.less`])
-        .pipe(plumber()) //如果less文件中有语法错误，用plumber保证任务不会停止
-        .pipe(less())
-        .pipe(gulpIf(Config.optionsPx2rem.open, postcss(processors)))
-        .pipe(base64(Config.optionsBase64))
-        .pipe(autoprefixer(Config.optionsPrefixer))
-        .pipe(gulp.dest(G_PATH.dev.css));
-});
-/* SASS --> CSS */
-gulp.task('sass', function () {
-    return gulp.src([G_PATH.dev.sass + '*.scss', '!' + G_PATH.dev.sass + '_*.scss'])
+/* 编译CSS，SASS --> CSS */
+gulp.task('sass', () => {
+    let processors = [px2rem({remUnit: Config.optionsPx2rem.remUnit})];
+    return gulp.src([`src/${PROJECT_NAME}/sass/*.scss`, `!src/${PROJECT_NAME}/sass/_*.scss`])
         .pipe(sass.sync().on('error', sass.logError))
         .pipe(gulpIf(Config.optionsPx2rem.open, postcss(processors)))
         .pipe(base64(Config.optionsBase64))
         .pipe(autoprefixer(Config.optionsPrefixer))
-        .pipe(gulp.dest(G_PATH.dev.css));
+        .pipe(gulp.dest(`src/${PROJECT_NAME}/css`));
 });
 
-/* 监听less文件夹下的*.less文件变化，然后执行less命令 */
-gulp.task('watch:less', ['less'], () => {
-    gulp.watch(G_PATH.dev.less + '*.less', ['less']);
-});
 /* 监听sass文件夹下的*.scss文件变化，然后执行sass命令 */
-gulp.task('watch:sass', ['sass'], function () {
-    gulp.watch(G_PATH.dev.sass + '*.scss', ['sass']);
+gulp.task('watch:sass', ['sass'], () => {
+    gulp.watch([`src/${PROJECT_NAME}/sass/*.scss`, `src/common/sass/*.scss`], ['sass']);
 });
 
 /*监听开发目录下的所有*.less *.scss *.css *.js *.html文件变化，然后自动刷新浏览器*/
-gulp.task('watch:browser', [CSS_PREPROCESSOR, 'browser-sync'], () => {
+gulp.task('watch:browser', ['sass', 'browser-sync'], () => {
     /*调用上面定义的 less 或 sass */
-    gulp.watch(G_PATH.dev[CSS_PREPROCESSOR] + '*.' + CSS_PREPROCESSOR.replace('sass', 'scss'), [CSS_PREPROCESSOR]);
+    gulp.watch([`src/${PROJECT_NAME}/sass/*.scss`, `src/common/sass/*.scss`], ['sass']);
     /*通过 browserSync 控制浏览器自动刷新*/
     let reload = browserSync.reload;
-    gulp.watch(G_PATH.dev.css + '*.css').on('change', reload);
-    gulp.watch(G_PATH.dev.js + '*.js').on('change', reload);
-    gulp.watch(G_PATH.dev.base + '*.html').on('change', reload);
+    gulp.watch([`src/${PROJECT_NAME}/*.html`, `src/${PROJECT_NAME}/css/*.css`, `src/${PROJECT_NAME}/js/*.js`]).on('change', browserSync.reload);
 });
 
 
@@ -150,6 +98,8 @@ gulp.task('watch:browser', [CSS_PREPROCESSOR, 'browser-sync'], () => {
 
 
 /* ----- 发布阶段 ----- */
+const pathReplaceRegulation = Utils.generateGulpReplaceTaskRegulation(PROJECT_NAME);
+const imageRevFlag = Config.optionsImagemin.type === 0;
 /* 图片压缩 */
 gulp.task('image', () => {
     /*附加插件，修复 jpeg 图片无法压缩，插件需要以数组的形式传入，不可使用对象*/
@@ -158,12 +108,12 @@ gulp.task('image', () => {
         imageminPngquant(),
         imageminJpegRecompress()
     ];
-    return gulp.src(G_PATH.dev.image + '**/*.+(png|jpg|jpeg|gif|svg)')
+    return gulp.src(`src/${PROJECT_NAME}/img/*.+(png|jpg|jpeg|gif|svg)`)
         .pipe(cache(imagemin(pluginsImagemin)))
-        //.pipe(rev())
-        .pipe(gulp.dest(G_PATH.dist.image))
-    //.pipe(rev.manifest())
-    //.pipe(gulp.dest(G_PATH.rev.image));
+        .pipe(gulpIf(imageRevFlag, rev()))
+        .pipe(gulp.dest(`dist/${PROJECT_NAME}/img`))
+        .pipe(gulpIf(imageRevFlag, rev.manifest()))
+        .pipe(gulpIf(imageRevFlag, gulp.dest(`rev/${PROJECT_NAME}/img`)));
 });
 
 /*
@@ -171,52 +121,55 @@ gulp.task('image', () => {
  * 如：fonts、lib等
  * */
 gulp.task('copy', () => {
-    const sourceFiles = [G_PATH.dev.lib + '**/*', `${G_PATH.dev.assets}**/*`];
-    return gulp.src(sourceFiles, {base: G_PATH.dev.base})
-        .pipe(gulp.dest(G_PATH.dist.base));
+    const sourceFiles = [`src/common/**/*`, `!src/common/sass`, `!src/common/sass/**/*`, `src/${PROJECT_NAME}/assets/**/*`];
+    return gulp.src(sourceFiles, {base: `src`})
+        .pipe(gulp.dest(`dist`));
 });
 
 /* 压缩CSS、增加版本号 */
 gulp.task('css', () => {
-    return gulp.src([G_PATH.rev.base + '**/*.json', G_PATH.dev.css + '*.css', `!${G_PATH.dev.css}*.min.css`])
+    return gulp.src([`rev/${PROJECT_NAME}/**/*.json`, `src/${PROJECT_NAME}/css/*.css`, `!src/${PROJECT_NAME}/css/*.min.css`])
         .pipe(revCollector())
-        .pipe(cssmin(Config.optionsCssmin))
-        //.pipe(cssUrlVersion()) //给css文件里引用文件加版本号（文件MD5）
+        .pipe(gulpIf(!Config.debug, cssmin(Config.optionsCssmin)))
+        .pipe(gulpIf(!imageRevFlag, cssUrlVersion())) //给css文件里引用文件加版本号（文件MD5）
+        .pipe(pathReplace(pathReplaceRegulation.css))
         .pipe(rev())
-        .pipe(gulp.dest(G_PATH.dist.css))
+        .pipe(gulp.dest(`dist/${PROJECT_NAME}/css`))
         .pipe(rev.manifest())
-        .pipe(gulp.dest(G_PATH.rev.css));
+        .pipe(gulp.dest(`rev/${PROJECT_NAME}/css`));
 });
 
 /* 压缩JS、增加版本号 */
 gulp.task('js', () => {
-    return gulp.src(G_PATH.dev.js + '*.js')
+    return gulp.src(`src/${PROJECT_NAME}/js/*.js`)
+        .pipe(pathReplace(pathReplaceRegulation.js))
         .pipe(jshint())
         .pipe(babel())
-        .pipe(uglify())
+        .pipe(gulpIf(!Config.debug, uglify()))
         .pipe(rev())
-        .pipe(gulp.dest(G_PATH.dist.js))
+        .pipe(gulp.dest(`dist/${PROJECT_NAME}/js`))
         .pipe(rev.manifest())
-        .pipe(gulp.dest(G_PATH.rev.js));
+        .pipe(gulp.dest(`rev/${PROJECT_NAME}/js`));
 });
 
 /* 压缩HTML、CSS、JS更改文件名 */
 gulp.task('html', () => {
-    return gulp.src([G_PATH.rev.base + '**/*.json', G_PATH.dev.base + '*.html'])
+    return gulp.src([`rev/${PROJECT_NAME}/**/*.json`, `src/${PROJECT_NAME}/*.html`])
         .pipe(revCollector())
-        .pipe(htmlmin(Config.optionsHtmlmin))
-        .pipe(gulp.dest(G_PATH.dist.base));
+        .pipe(pathReplace(pathReplaceRegulation.html))
+        .pipe(gulpIf(!Config.debug, htmlmin(Config.optionsHtmlmin)))
+        .pipe(gulp.dest(`dist/${PROJECT_NAME}`));
 });
 
 /* 执行build前清理发布文件夹 */
 gulp.task('clean', () => {
-    return gulp.src([G_PATH.dist.base, G_PATH.rev.base], {read: false})
+    return gulp.src([`dist/${PROJECT_NAME}`, `rev/${PROJECT_NAME}`], {read: false})
         .pipe(clean())
 });
 /* 同时删除图片缓存 */
 gulp.task('clean:all', () => {
     cache.clearAll();
-    return gulp.src([G_PATH.dist.base, G_PATH.rev.base], {read: false})
+    return gulp.src([`dist/${PROJECT_NAME}`, `rev/${PROJECT_NAME}`], {read: false})
         .pipe(clean())
 });
 
@@ -224,7 +177,7 @@ gulp.task('clean:all', () => {
 gulp.task('build', () => {
     runSequence(
         'clean',
-        [CSS_PREPROCESSOR, 'image', 'copy'],
+        ['sass', 'image', 'copy'],
         ['css', 'js'],
         'html')
 });
@@ -232,7 +185,7 @@ gulp.task('build', () => {
 gulp.task('build:clean', () => {
     runSequence(
         'clean:all',
-        [CSS_PREPROCESSOR, 'image', 'copy'],
+        ['sass', 'image', 'copy'],
         ['css', 'js'],
         'html')
 });

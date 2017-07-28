@@ -3,4 +3,7 @@
 node_modules/
 dist/
 rev/
+src/
+!src/common
+!src/ecloud-6
 npm-debug.log

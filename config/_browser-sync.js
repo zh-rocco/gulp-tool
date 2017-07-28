@@ -8,6 +8,10 @@ module.exports = {
             port: 3335
         }
     },
+    /*proxy: {
+        target: "http://home.cloud.189.cn",
+    },*/
+    serveStatic: ['src/'],
     server: {
         index: 'index.html' //静态服务器打开的首页面，可以根据需要配置
     },

@@ -49,19 +49,19 @@ var imagesLoadList = [
 
 /* 通用方法 */
 const Utils = {
-    isFunction (fn) {
+    isFunction(fn) {
         return Object.prototype.toString.call(fn) === '[object Function]';
     }
 };
 
 var Page = {
     mySwiper: {},
-    init () {
+    init() {
         Page.loadImages(Page.initSwiper);
         _uxt.push(['_trackEvent', '专题', '天翼云盘6.0-H5', '打开H5页面', 1]);
 
     },
-    initSwiper () {
+    initSwiper() {
         Page.mySwiper = new Swiper('.swiper-container', {
             direction: 'vertical',
             initialSlide: 0,
@@ -82,10 +82,10 @@ var Page = {
         /* 添加事件 */
         Page.addEvents();
     },
-    loadImages (cb) {
+    loadImages(cb) {
         var unloaded = imagesLoadList.length;
 
-        for (var i = 0, len = imagesLoadList.length; i < len; i++) {
+        /*for (var i = 0, len = imagesLoadList.length; i < len; i++) {
             var img = new Image();
             img.src = imagesLoadList[i];
             img.onload = () => {
@@ -97,9 +97,12 @@ var Page = {
                     Utils.isFunction(cb) && cb();
                 }
             }
-        }
+        }*/
+        $('#J_Loading').hide();
+        $('.swiper-container').css('display', 'block');
+        cb();
     },
-    addEvents () {
+    addEvents() {
         var that = this;
         var musicSwitch = $('#J_musicButton'),
             audio = $('#J_audio')[0],

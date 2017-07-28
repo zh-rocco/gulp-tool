@@ -1,5 +1,5 @@
-@import "_reset";
-@import "_base";
+@import "../../common/sass/_reset";
+@import "../../common/sass/_base";
 
 *::-webkit-scrollbar {
     width: 0;
@@ -682,4 +682,56 @@ body {
             height: 77px;
         }
     }
+}
+
+.end-mask {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.8);
+    z-index: 999;
+}
+
+.end-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: 560px;
+    height: 613px;
+    margin-left: -280px;
+    margin-top: -307px;
+    background-color: #ffe075;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.end-modal img {
+    display: block;
+    margin: 46px auto 20px;
+}
+
+.end-modal span {
+    font-size: 32px;
+    font-weight: bold;
+}
+
+.end-modal .button {
+    display: block;
+    height: 90px;
+    margin: 0 auto;
+    line-height: 90px;
+    font-size: 36px;
+    color: #fff;
+    background: #ff5b1a;
+    text-align: center;
+    width: 460px;
+    margin-top: 54px;
+    border-radius: 50%/230px;
+}
+
+.end-modal img {
+    display: block;
+    width: 329px;
 }
