@@ -1,10 +1,10 @@
 const
     Config = require('./config/index'),
-    Utils = require('./config/utils'),
     PROJECT_NAME = Config.projectName;
 
 /* 插件列表 */
 let gulp = require('gulp'),
+    path = require('path'),
     clean = require('gulp-clean'), //删除文件夹
     concat = require('gulp-concat'), //合并文件
     rename = require('gulp-rename'), //改名
@@ -13,7 +13,7 @@ let gulp = require('gulp'),
     gulpIf = require('gulp-if'), //gulp 内 if 判断
     runSequence = require('run-sequence'),  //顺序执行
     browserSync = require('browser-sync'), //浏览器自动刷新
-    pathReplace = require('gulp-replace-task'), //字符串替换
+    replace = require('gulp-replace'), //字符串替换
 
     /* HTML处理 */
     htmlmin = require('gulp-htmlmin'), //压缩HTML
@@ -87,7 +87,6 @@ gulp.task('watch:browser', ['sass', 'browser-sync'], () => {
     /*调用上面定义的 less 或 sass */
     gulp.watch([`src/${PROJECT_NAME}/sass/*.scss`, `src/common/sass/*.scss`], ['sass']);
     /*通过 browserSync 控制浏览器自动刷新*/
-    let reload = browserSync.reload;
     gulp.watch([`src/${PROJECT_NAME}/*.html`, `src/${PROJECT_NAME}/css/*.css`, `src/${PROJECT_NAME}/js/*.js`]).on('change', browserSync.reload);
 });
 
@@ -98,8 +97,9 @@ gulp.task('watch:browser', ['sass', 'browser-sync'], () => {
 
 
 /* ----- 发布阶段 ----- */
-const pathReplaceRegulation = Utils.generateGulpReplaceTaskRegulation(PROJECT_NAME);
 const imageRevFlag = Config.optionsImagemin.type === 0;
+const pathRegex = Config.optionsPath;
+
 /* 图片压缩 */
 gulp.task('image', () => {
     /*附加插件，修复 jpeg 图片无法压缩，插件需要以数组的形式传入，不可使用对象*/
@@ -129,10 +129,12 @@ gulp.task('copy', () => {
 /* 压缩CSS、增加版本号 */
 gulp.task('css', () => {
     return gulp.src([`rev/${PROJECT_NAME}/**/*.json`, `src/${PROJECT_NAME}/css/*.css`, `!src/${PROJECT_NAME}/css/*.min.css`])
+        .pipe(replace(/\.{1,2}\/(img|assets)/ig, match => {
+            return path.posix.join(pathRegex.buildRootPath, PROJECT_NAME, 'css', match);
+        }))
         .pipe(revCollector())
         .pipe(gulpIf(!Config.debug, cssmin(Config.optionsCssmin)))
         .pipe(gulpIf(!imageRevFlag, cssUrlVersion())) //给css文件里引用文件加版本号（文件MD5）
-        .pipe(pathReplace(pathReplaceRegulation.css))
         .pipe(rev())
         .pipe(gulp.dest(`dist/${PROJECT_NAME}/css`))
         .pipe(rev.manifest())
@@ -142,7 +144,6 @@ gulp.task('css', () => {
 /* 压缩JS、增加版本号 */
 gulp.task('js', () => {
     return gulp.src(`src/${PROJECT_NAME}/js/*.js`)
-        .pipe(pathReplace(pathReplaceRegulation.js))
         .pipe(jshint())
         .pipe(babel())
         .pipe(gulpIf(!Config.debug, uglify()))
@@ -155,8 +156,10 @@ gulp.task('js', () => {
 /* 压缩HTML、CSS、JS更改文件名 */
 gulp.task('html', () => {
     return gulp.src([`rev/${PROJECT_NAME}/**/*.json`, `src/${PROJECT_NAME}/*.html`])
+        .pipe(replace(/\.{1,2}\/(common|css|img|assets|js)/ig, match => {
+            return path.posix.join(pathRegex.buildRootPath, PROJECT_NAME, match);
+        }))
         .pipe(revCollector())
-        .pipe(pathReplace(pathReplaceRegulation.html))
         .pipe(gulpIf(!Config.debug, htmlmin(Config.optionsHtmlmin)))
         .pipe(gulp.dest(`dist/${PROJECT_NAME}`));
 });

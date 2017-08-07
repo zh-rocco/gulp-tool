@@ -1,9 +1,10 @@
 .idea/
 .history/
 node_modules/
-dist/
 rev/
-src/
-!src/common
-!src/ecloud-6
+dist/
+src/wap-speed/
+src/family-guide/
+src/family-sms/
+src/popup/
 npm-debug.log
