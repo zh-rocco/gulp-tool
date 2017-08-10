@@ -4,4 +4,4 @@ module.exports = {
     extensions: ['png'],
     maxImageSize: 1024, //小于 1kb 转成 base64
     debug: false
-};
+}

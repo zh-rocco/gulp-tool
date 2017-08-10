@@ -10,4 +10,4 @@ module.exports = {
     minifyCSS: true, //压缩页面CSS
     minifyJS: true, //压缩页面JS
     minifyURLs: true //压缩页面内URL
-};
+}

@@ -5,7 +5,7 @@ const optionsPx2rem = require('./_px2rem'),
     optionsHtmlmin = require('./_htmlmin'),
     browserSync = require('./_browser-sync'),
     optionsImagemin = require('./_imagemin'),
-    optionsPath = require('./_path');
+    optionsPath = require('./_path')
 
 module.exports = {
     /*项目名称*/
@@ -28,4 +28,4 @@ module.exports = {
     optionsImagemin,
     /*构建时路径处理*/
     optionsPath
-};
+}
