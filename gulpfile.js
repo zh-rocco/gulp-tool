@@ -1,6 +1,6 @@
 const
     Config = require('./config/index'),
-    PROJECT_NAME = Config.projectName;
+    PROJECT_NAME = Config.projectName
 
 /* 插件列表 */
 let gulp = require('gulp'),
@@ -27,7 +27,7 @@ let gulp = require('gulp'),
 
     /* JS处理 */
     jshint = require('gulp-jshint'), //JS校验，依赖jshint
-    babel = require("gulp-babel"), //ES6 -> ES5
+    babel = require('gulp-babel'), //ES6 -> ES5
     uglify = require('gulp-uglify'), //压缩JS
 
     /* 图片处理 */
@@ -40,7 +40,7 @@ let gulp = require('gulp'),
     /* 版本管理 */
     cssUrlVersion = require('gulp-make-css-url-version'), //为CSS文件内的URL进行版本管理
     rev = require('gulp-rev'), //增加版本号
-    revCollector = require('gulp-rev-collector'); //配合 gulp-rev 使用
+    revCollector = require('gulp-rev-collector') //配合 gulp-rev 使用
 
 
 /* ----- 开发阶段 ----- */
@@ -57,38 +57,38 @@ gulp.task('sprite', () => {
             cssName: 'sprite.css',
             padding: 5
         }))
-        .pipe(gulp.dest(`src/${PROJECT_NAME}/merge`));
-});
+        .pipe(gulp.dest(`src/${PROJECT_NAME}/merge`))
+})
 
 /* 静态服务器 */
-let browserSyncOpt = Object.assign(Config.browserSync, {server: {baseDir: `src/${PROJECT_NAME}/`}});
+let browserSyncOpt = Object.assign(Config.browserSync, {server: {baseDir: `src/${PROJECT_NAME}/`}})
 gulp.task('browser-sync', () => {
-    browserSync.init(browserSyncOpt);
-});
+    browserSync.init(browserSyncOpt)
+})
 
 /* 编译CSS，SASS --> CSS */
 gulp.task('sass', () => {
-    let processors = [px2rem({remUnit: Config.optionsPx2rem.remUnit})];
+    let processors = [px2rem({remUnit: Config.optionsPx2rem.remUnit})]
     return gulp.src([`src/${PROJECT_NAME}/sass/*.scss`, `!src/${PROJECT_NAME}/sass/_*.scss`])
         .pipe(sass.sync().on('error', sass.logError))
         .pipe(gulpIf(Config.optionsPx2rem.open, postcss(processors)))
         .pipe(base64(Config.optionsBase64))
         .pipe(autoprefixer(Config.optionsPrefixer))
-        .pipe(gulp.dest(`src/${PROJECT_NAME}/css`));
-});
+        .pipe(gulp.dest(`src/${PROJECT_NAME}/css`))
+})
 
 /* 监听sass文件夹下的*.scss文件变化，然后执行sass命令 */
 gulp.task('watch:sass', ['sass'], () => {
-    gulp.watch([`src/${PROJECT_NAME}/sass/*.scss`, `src/common/sass/*.scss`], ['sass']);
-});
+    gulp.watch([`src/${PROJECT_NAME}/sass/*.scss`, `src/common/sass/*.scss`], ['sass'])
+})
 
 /*监听开发目录下的所有*.less *.scss *.css *.js *.html文件变化，然后自动刷新浏览器*/
 gulp.task('watch:browser', ['sass', 'browser-sync'], () => {
     /*调用上面定义的 less 或 sass */
-    gulp.watch([`src/${PROJECT_NAME}/sass/*.scss`, `src/common/sass/*.scss`], ['sass']);
+    gulp.watch([`src/${PROJECT_NAME}/sass/*.scss`, `src/common/sass/*.scss`], ['sass'])
     /*通过 browserSync 控制浏览器自动刷新*/
-    gulp.watch([`src/${PROJECT_NAME}/*.html`, `src/${PROJECT_NAME}/css/*.css`, `src/${PROJECT_NAME}/js/*.js`]).on('change', browserSync.reload);
-});
+    gulp.watch([`src/${PROJECT_NAME}/*.html`, `src/${PROJECT_NAME}/css/*.css`, `src/${PROJECT_NAME}/js/*.js`]).on('change', browserSync.reload)
+})
 
 
 /*-*/
@@ -97,8 +97,8 @@ gulp.task('watch:browser', ['sass', 'browser-sync'], () => {
 
 
 /* ----- 发布阶段 ----- */
-const imageRevFlag = Config.optionsImagemin.type === 0;
-const pathRegex = Config.optionsPath;
+const imageRevFlag = Config.optionsImagemin.type === 0
+const pathRegex = Config.optionsPath
 
 /* 图片压缩 */
 gulp.task('image', () => {
@@ -107,39 +107,42 @@ gulp.task('image', () => {
     let pluginsImagemin = [
         imageminPngquant(),
         imageminJpegRecompress()
-    ];
+    ]
     return gulp.src(`src/${PROJECT_NAME}/img/*.+(png|jpg|jpeg|gif|svg)`)
         .pipe(cache(imagemin(pluginsImagemin)))
         .pipe(gulpIf(imageRevFlag, rev()))
         .pipe(gulp.dest(`dist/${PROJECT_NAME}/img`))
         .pipe(gulpIf(imageRevFlag, rev.manifest()))
-        .pipe(gulpIf(imageRevFlag, gulp.dest(`rev/${PROJECT_NAME}/img`)));
-});
+        .pipe(gulpIf(imageRevFlag, gulp.dest(`rev/${PROJECT_NAME}/img`)))
+})
 
 /*
  * 复制静态资源
  * 如：fonts、lib等
  * */
 gulp.task('copy', () => {
-    const sourceFiles = [`src/common/**/*`, `!src/common/sass`, `!src/common/sass/**/*`, `src/${PROJECT_NAME}/assets/**/*`];
+    const sourceFiles = [`src/common/**/*`, `!src/common/sass`, `!src/common/sass/**/*`, `src/${PROJECT_NAME}/assets/**/*`, `src/${PROJECT_NAME}/lib/**/*`]
     return gulp.src(sourceFiles, {base: `src`})
-        .pipe(gulp.dest(`dist`));
-});
+        .pipe(gulp.dest(`dist`))
+})
 
 /* 压缩CSS、增加版本号 */
 gulp.task('css', () => {
     return gulp.src([`rev/${PROJECT_NAME}/**/*.json`, `src/${PROJECT_NAME}/css/*.css`, `!src/${PROJECT_NAME}/css/*.min.css`])
-        .pipe(replace(/\.{1,2}\/(img|assets)/ig, match => {
-            return path.posix.join(pathRegex.buildRootPath, PROJECT_NAME, 'css', match);
-        }))
+        .pipe(gulpIf(
+            pathRegex.open,
+            replace(/\.{1,2}\/(img|assets)/ig, match => {
+                return path.posix.join(pathRegex.buildRootPath, PROJECT_NAME, 'css', match)
+            })
+        ))
         .pipe(revCollector())
         .pipe(gulpIf(!Config.debug, cssmin(Config.optionsCssmin)))
         .pipe(gulpIf(!imageRevFlag, cssUrlVersion())) //给css文件里引用文件加版本号（文件MD5）
         .pipe(rev())
         .pipe(gulp.dest(`dist/${PROJECT_NAME}/css`))
         .pipe(rev.manifest())
-        .pipe(gulp.dest(`rev/${PROJECT_NAME}/css`));
-});
+        .pipe(gulp.dest(`rev/${PROJECT_NAME}/css`))
+})
 
 /* 压缩JS、增加版本号 */
 gulp.task('js', () => {
@@ -150,31 +153,34 @@ gulp.task('js', () => {
         .pipe(rev())
         .pipe(gulp.dest(`dist/${PROJECT_NAME}/js`))
         .pipe(rev.manifest())
-        .pipe(gulp.dest(`rev/${PROJECT_NAME}/js`));
-});
+        .pipe(gulp.dest(`rev/${PROJECT_NAME}/js`))
+})
 
 /* 压缩HTML、CSS、JS更改文件名 */
 gulp.task('html', () => {
     return gulp.src([`rev/${PROJECT_NAME}/**/*.json`, `src/${PROJECT_NAME}/*.html`])
-        .pipe(replace(/\.{1,2}\/(common|css|img|assets|js)/ig, match => {
-            return path.posix.join(pathRegex.buildRootPath, PROJECT_NAME, match);
-        }))
+        .pipe(gulpIf(
+            pathRegex.open,
+            replace(/\.{1,2}\/(common|css|img|assets|js)/ig, match => {
+                return path.posix.join(pathRegex.buildRootPath, PROJECT_NAME, match)
+            })
+        ))
         .pipe(revCollector())
         .pipe(gulpIf(!Config.debug, htmlmin(Config.optionsHtmlmin)))
-        .pipe(gulp.dest(`dist/${PROJECT_NAME}`));
-});
+        .pipe(gulp.dest(`dist/${PROJECT_NAME}`))
+})
 
 /* 执行build前清理发布文件夹 */
 gulp.task('clean', () => {
     return gulp.src([`dist/${PROJECT_NAME}`, `rev/${PROJECT_NAME}`], {read: false})
         .pipe(clean())
-});
+})
 /* 同时删除图片缓存 */
 gulp.task('clean:all', () => {
-    cache.clearAll();
+    cache.clearAll()
     return gulp.src([`dist/${PROJECT_NAME}`, `rev/${PROJECT_NAME}`], {read: false})
         .pipe(clean())
-});
+})
 
 /* 发布任务 */
 gulp.task('build', () => {
@@ -183,7 +189,7 @@ gulp.task('build', () => {
         ['sass', 'image', 'copy'],
         ['css', 'js'],
         'html')
-});
+})
 
 gulp.task('build:clean', () => {
     runSequence(
@@ -191,4 +197,4 @@ gulp.task('build:clean', () => {
         ['sass', 'image', 'copy'],
         ['css', 'js'],
         'html')
-});
+})
