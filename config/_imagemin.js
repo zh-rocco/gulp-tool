@@ -4,5 +4,6 @@
  */
 
 module.exports = {
-    type: 0
-}
+  open: false,
+  type: 0
+};
