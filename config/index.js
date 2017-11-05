@@ -9,7 +9,7 @@ const optionsPx2rem = require('./_px2rem'),
 
 module.exports = {
   /*项目名称*/
-  projectName: 'fanlianjizi',
+  projectName: 'font-size',
   /*控制 build 时是否压缩 html、css、js，DEBUG = true 不压缩*/
   debug: true,
   /*是否开启 px -> rem，配合 flexible.js 使用，未引入 flexible.js 请设为 false*/
