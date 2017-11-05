@@ -1,0 +1,21 @@
+{
+  "name": "gulp-build-tools",
+  "version": "3.0.0",
+  "description": "My gulp build tools.",
+  "main": "gulpfile.js",
+  "scripts": {
+    "dev": "gulp watch:browser",
+    "build": "gulp build",
+    "build:clean": "gulp build:clean"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/no-nothing/gulp.git"
+  },
+  "author": "no-nothing",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/no-nothing/gulp/issues"
+  },
+  "homepage": "https://github.com/no-nothing/gulp#readme"
+}
