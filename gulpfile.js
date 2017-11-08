@@ -1,8 +1,8 @@
 const Options = require('./config/index'),
-  PROJECT_NAME = Options._currentProject
+  PROJECT_NAME = Options._currentProject,
+  DEBUG = Options.debug
 
 console.log(Options)
-
 // return false
 
 const /* 基础 */
@@ -49,6 +49,8 @@ gulp.task('css', () => {
     devProcessors = [...baseProcessors],
     buildProcessors = [...baseProcessors, autoprefixer(Options.css.autoprefixer), cssnano()]
 
+  if (DEBUG) buildProcessors = [...baseProcessors, autoprefixer(Options.css.autoprefixer)]
+
   return gulp
     .src([`src/${PROJECT_NAME}/scss/*.scss`, `!src/${PROJECT_NAME}/scss/_*.scss`])
     .pipe(sass.sync().on('error', sass.logError))
@@ -59,7 +61,7 @@ gulp.task('css', () => {
 
 /* 监听 scss 文件夹下的 *.scss 文件变化，然后执行 css:dev 命令 */
 gulp.task('watch:css', ['css'], () => {
-  gulp.watch([`src/${PROJECT_NAME}/scss/*.scss`, `src/common/scss/*.scss`], ['css'])
+  gulp.watch([`src/${PROJECT_NAME}/scss/**/*.scss`, `src/common/scss/**/*.scss`], ['css'])
 })
 
 /* 开发任务 */
@@ -80,12 +82,17 @@ gulp.task('build:image', () => {
   const pluginsImagemin = [imageminPngquant(), imageminJpegRecompress()]
 
   return gulp
-    .src(`src/${PROJECT_NAME}/img/*.+(png|jpg|jpeg|gif|svg)`)
-    .pipe(gulpIf(Options.imagemin.__open, cache(imagemin(pluginsImagemin))))
-    .pipe(gulpIf(Options.revision.__open, rev()))
+    .src(`src/${PROJECT_NAME}/img/**/*.+(png|jpg|jpeg|gif|svg)`)
+    .pipe(gulpIf(!DEBUG && Options.imagemin.__open, cache(imagemin(pluginsImagemin))))
+    .pipe(gulpIf(!DEBUG && Options.revision.__open, rev()))
     .pipe(gulp.dest(`dist/${PROJECT_NAME}/img`))
-    .pipe(gulpIf(Options.revision.__open && Options.revision.image === 'hash', rev.manifest()))
-    .pipe(gulpIf(Options.revision.__open && Options.revision.image === 'hash', gulp.dest(`rev/${PROJECT_NAME}/img`)))
+    .pipe(gulpIf(!DEBUG && Options.revision.__open && Options.revision.image === 'hash', rev.manifest()))
+    .pipe(
+      gulpIf(
+        !DEBUG && Options.revision.__open && Options.revision.image === 'hash',
+        gulp.dest(`rev/${PROJECT_NAME}/img`)
+      )
+    )
 })
 
 /* 复制静态资源，如：fonts、lib 等 */
@@ -103,7 +110,7 @@ gulp.task('build:copy', () => {
 /* 压缩 CSS、增加版本号 */
 gulp.task('build:css', ['css'], () => {
   return gulp
-    .src([`rev/${PROJECT_NAME}/**/*.json`, `src/${PROJECT_NAME}/css/*.css`, `!src/${PROJECT_NAME}/css/*.min.css`])
+    .src([`rev/${PROJECT_NAME}/**/*.json`, `src/${PROJECT_NAME}/css/**/*.css`, `!src/${PROJECT_NAME}/css/**/*.min.css`])
     .pipe(
       gulpIf(
         Options.absolutePath.__open,
@@ -112,12 +119,12 @@ gulp.task('build:css', ['css'], () => {
         })
       )
     )
-    .pipe(gulpIf(Options.revision.__open, revCollector()))
-    .pipe(gulpIf(Options.revision.__open && Options.revision.image === 'query', cssUrlVersion())) //给 css 文件里引用文件加版本号（文件MD5）
-    .pipe(gulpIf(Options.revision.__open, rev()))
+    .pipe(gulpIf(!DEBUG && Options.revision.__open, revCollector()))
+    .pipe(gulpIf(!DEBUG && Options.revision.__open && Options.revision.image === 'query', cssUrlVersion())) //给 css 文件里引用文件加版本号（文件MD5）
+    .pipe(gulpIf(!DEBUG && Options.revision.__open, rev()))
     .pipe(gulp.dest(`dist/${PROJECT_NAME}/css`))
-    .pipe(gulpIf(Options.revision.__open, rev.manifest()))
-    .pipe(gulpIf(Options.revision.__open, gulp.dest(`rev/${PROJECT_NAME}/css`)))
+    .pipe(gulpIf(!DEBUG && Options.revision.__open, rev.manifest()))
+    .pipe(gulpIf(!DEBUG && Options.revision.__open, gulp.dest(`rev/${PROJECT_NAME}/css`)))
 })
 
 /* 压缩 JS、增加版本号 */
@@ -125,11 +132,11 @@ gulp.task('build:js', () => {
   return gulp
     .src(`src/${PROJECT_NAME}/js/*.js`)
     .pipe(babel())
-    .pipe(gulpIf(!Options.debug, uglify()))
-    .pipe(gulpIf(Options.revision.__open, rev()))
+    .pipe(gulpIf(!DEBUG, uglify()))
+    .pipe(gulpIf(!DEBUG && Options.revision.__open, rev()))
     .pipe(gulp.dest(`dist/${PROJECT_NAME}/js`))
-    .pipe(gulpIf(Options.revision.__open, rev.manifest()))
-    .pipe(gulpIf(Options.revision.__open, gulp.dest(`rev/${PROJECT_NAME}/js`)))
+    .pipe(gulpIf(!DEBUG && Options.revision.__open, rev.manifest()))
+    .pipe(gulpIf(!DEBUG && Options.revision.__open, gulp.dest(`rev/${PROJECT_NAME}/js`)))
 })
 
 /* 压缩HTML，CSS、JS更改文件名 */
@@ -144,8 +151,8 @@ gulp.task('build:html', () => {
         })
       )
     )
-    .pipe(gulpIf(Options.revision.__open, revCollector()))
-    .pipe(gulpIf(!Options.debug, htmlmin(Options.html)))
+    .pipe(gulpIf(!DEBUG && Options.revision.__open, revCollector()))
+    .pipe(gulpIf(!DEBUG, htmlmin(Options.html)))
     .pipe(gulp.dest(`dist/${PROJECT_NAME}`))
 })
 
