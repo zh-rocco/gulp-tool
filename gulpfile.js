@@ -45,7 +45,7 @@ gulp.task('browser-sync', () => {
 gulp.task('css', () => {
   let baseProcessors = Options.css.px2rem.__open ? [px2rem(Options.css.px2rem)] : [],
     devProcessors = [...baseProcessors],
-    buildProcessors = [...baseProcessors, autoprefixer(Options.css.autoprefixer), cssnano()]
+    buildProcessors = [...baseProcessors, autoprefixer(Options.css.autoprefixer), cssnano({ zindex: false })]
 
   if (DEBUG) buildProcessors = [...baseProcessors, autoprefixer(Options.css.autoprefixer)]
 
