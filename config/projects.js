@@ -15,8 +15,13 @@ const _currentProject = 'family-cloud-gd', // string
         }
       },
       css: {
-        minify: { __open: false },
-        autoprefixer: { browsers: ['Android >= 4.0', 'iOS >= 7', 'last 5 versions'] }
+        autoprefixer: { browsers: ['Android >= 4.0', 'iOS >= 7', 'ie >= 9'] }
+      }
+    },
+    'family-sms-guangxi': {
+      debug: true,
+      css: {
+        autoprefixer: { browsers: ['Android >= 4.0', 'iOS >= 7'] }
       }
     }
   }

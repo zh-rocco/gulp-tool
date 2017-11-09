@@ -6,4 +6,6 @@ node_modules/
 rev/
 dist/
 src/family-cloud-gd/
+src/family-sms-guangxi/
+src/family-guide-guangxi/
 *.log

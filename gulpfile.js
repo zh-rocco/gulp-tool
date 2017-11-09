@@ -2,10 +2,8 @@ const Options = require('./config/index'),
   PROJECT_NAME = Options._currentProject,
   DEBUG = Options.debug
 
-console.log(Options)
-// return false
-
 const /* 基础 */
+  merge = require('merge'),
   gulp = require('gulp'),
   path = require('path'),
   browserSync = require('browser-sync'), //浏览器自动刷新
@@ -38,7 +36,7 @@ const /* 基础 */
 
 /* 静态服务器 */
 gulp.task('browser-sync', () => {
-  const browserSyncOpt = Object.assign(Options.browserSync, { server: { baseDir: `src/${PROJECT_NAME}/` } })
+  const browserSyncOpt = merge.recursive(true, Options.browserSync, { server: { baseDir: `src/${PROJECT_NAME}/` } })
 
   return browserSync.init(browserSyncOpt)
 })
