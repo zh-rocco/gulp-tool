@@ -36,8 +36,8 @@ const revCollector = require('gulp-rev-collector') //配合 gulp-rev 使用
 
 /* 静态服务器 */
 gulp.task('browser-sync', () => {
-  // const browserSyncOpt = merge.recursive(true, Options.browserSync, { server: { baseDir: `src/${PROJECT_NAME}/` } })
-  return browserSync.init(Options.browserSync)
+  const browserSyncOpt = merge.recursive(true, Options.browserSync, { server: { baseDir: `src/${PROJECT_NAME}/` } })
+  return browserSync.init(browserSyncOpt)
 })
 
 /* 编译CSS，SASS --> CSS */
