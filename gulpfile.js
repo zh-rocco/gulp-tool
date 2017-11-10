@@ -1,44 +1,43 @@
-const Options = require('./config/index'),
-  PROJECT_NAME = Options._currentProject,
-  DEBUG = Options.debug
+const Options = require('./config/index')
+const PROJECT_NAME = Options._currentProject
+const DEBUG = Options.debug
 
-const /* 基础 */
-  merge = require('merge'),
-  gulp = require('gulp'),
-  path = require('path'),
-  browserSync = require('browser-sync'), //浏览器自动刷新
-  sourcemaps = require('gulp-sourcemaps'),
-  runSequence = require('run-sequence'), //顺序执行
-  gulpIf = require('gulp-if'), //gulp 内 if 判断
-  clean = require('gulp-clean'), //删除文件夹
-  replace = require('gulp-replace'), //字符串替换
-  /* HTML处理 */
-  htmlmin = require('gulp-htmlmin'), //压缩HTML
-  /* CSS处理 */
-  sass = require('gulp-sass'),
-  base64 = require('gulp-base64'), //图片 base64 转码
-  postcss = require('gulp-postcss'),
-  px2rem = require('postcss-px2rem'), //px -> rem，配合 flexible.js 使用
-  autoprefixer = require('autoprefixer'), //为CSS添加浏览器私有前缀
-  cssnano = require('cssnano'),
-  /* JS处理 */
-  babel = require('gulp-babel'), //ES6 -> ES5
-  uglify = require('gulp-uglify'), //压缩JS
-  /* 图片压缩 */
-  cache = require('gulp-cache'), //缓存管理，提高图片第二次压缩的速度
-  imagemin = require('gulp-imagemin'), //压缩图片
-  imageminPngquant = require('imagemin-pngquant'), //imagemin 插件
-  imageminJpegRecompress = require('imagemin-jpeg-recompress'), //imagemin 插件
-  /* 版本管理 */
-  cssUrlVersion = require('gulp-make-css-url-version'), //为 CSS 文件内的 URL 进行版本管理
-  rev = require('gulp-rev'), //增加版本号
-  revCollector = require('gulp-rev-collector') //配合 gulp-rev 使用
+/* 基础 */
+const merge = require('merge') //对象合并
+const gulp = require('gulp')
+const path = require('path')
+const browserSync = require('browser-sync') //浏览器自动刷新
+const sourcemaps = require('gulp-sourcemaps')
+const runSequence = require('run-sequence') //顺序执行
+const gulpIf = require('gulp-if') //gulp 内 if 判断
+const clean = require('gulp-clean') //删除文件夹
+const replace = require('gulp-replace') //字符串替换
+/* HTML处理 */
+const htmlmin = require('gulp-htmlmin') //压缩HTML
+/* CSS处理 */
+const sass = require('gulp-sass')
+const base64 = require('gulp-base64') //图片 base64 转码
+const postcss = require('gulp-postcss') //CSS 后处理器
+const px2rem = require('postcss-px2rem') //px -> rem，配合 flexible.js 使用
+const autoprefixer = require('autoprefixer') //为 CSS 添加浏览器私有前缀
+const cssnano = require('cssnano')
+/* JS处理 */
+const babel = require('gulp-babel') //ES6 -> ES5
+const uglify = require('gulp-uglify') //压缩 JS
+/* 图片压缩 */
+const cache = require('gulp-cache') //缓存管理，提高图片第二次压缩的速度
+const imagemin = require('gulp-imagemin') //压缩图片
+const imageminPngquant = require('imagemin-pngquant') //imagemin 插件
+const imageminJpegRecompress = require('imagemin-jpeg-recompress') //imagemin 插件
+/* 版本管理 */
+const cssUrlVersion = require('gulp-make-css-url-version') //为 CSS 文件内的 URL 进行版本管理
+const rev = require('gulp-rev') //增加版本号
+const revCollector = require('gulp-rev-collector') //配合 gulp-rev 使用
 
 /* 静态服务器 */
 gulp.task('browser-sync', () => {
-  const browserSyncOpt = merge.recursive(true, Options.browserSync, { server: { baseDir: `src/${PROJECT_NAME}/` } })
-
-  return browserSync.init(browserSyncOpt)
+  // const browserSyncOpt = merge.recursive(true, Options.browserSync, { server: { baseDir: `src/${PROJECT_NAME}/` } })
+  return browserSync.init(Options.browserSync)
 })
 
 /* 编译CSS，SASS --> CSS */

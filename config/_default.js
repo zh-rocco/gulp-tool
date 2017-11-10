@@ -1,3 +1,5 @@
+/***** 谨慎改动此文件 *****/
+
 module.exports = {
   debug: false, // debug 模式下不压缩代码、静态资源不添加版本号
   browserSync: {

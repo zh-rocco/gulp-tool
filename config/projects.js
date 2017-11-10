@@ -1,4 +1,4 @@
-const _currentProject = 'family-cloud-gd', // string
+const _currentProject = 'example', // string
   ProjectsConfig = {
     example: {
       debug: false,
@@ -19,7 +19,7 @@ const _currentProject = 'family-cloud-gd', // string
       }
     },
     'family-sms-guangxi': {
-      debug: true,
+      debug: false,
       css: {
         autoprefixer: { browsers: ['Android >= 4.0', 'iOS >= 7'] }
       }
