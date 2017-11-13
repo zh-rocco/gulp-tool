@@ -42,11 +42,11 @@ gulp.task('browser-sync', () => {
 
 /* 编译CSS，SASS --> CSS */
 gulp.task('css', () => {
-  let baseProcessors = Options.css.px2rem.__open ? [px2rem(Options.css.px2rem)] : [],
-    devProcessors = [...baseProcessors],
-    buildProcessors = [...baseProcessors, autoprefixer(Options.css.autoprefixer), cssnano({ zindex: false })]
+  let devProcessors = []
+  if (Options.css.px2rem.__open) devProcessors.push(px2rem(Options.css.px2rem))
 
-  if (DEBUG) buildProcessors = [...baseProcessors, autoprefixer(Options.css.autoprefixer)]
+  let buildProcessors = [...devProcessors, autoprefixer(Options.css.autoprefixer)]
+  if (!DEBUG) buildProcessors.push(cssnano({ zindex: false }))
 
   return gulp
     .src([`src/${PROJECT_NAME}/scss/*.scss`, `!src/${PROJECT_NAME}/scss/_*.scss`])
@@ -165,5 +165,5 @@ gulp.task('clean:cache', () => {
 
 /* 发布任务 */
 gulp.task('build', () => {
-  runSequence('clean', ['css', 'build:image', 'build:copy'], ['build:css', 'build:js'], 'build:html')
+  runSequence('clean', ['build:copy', 'build:image'], ['build:css', 'build:js'], 'build:html')
 })
