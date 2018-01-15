@@ -8,4 +8,7 @@ dist/
 src/family-cloud-gd/
 src/family-sms-guangxi/
 src/family-guide-guangxi/
+src/huafei/
+src/galiao/
+src/family-recommend/
 *.log
