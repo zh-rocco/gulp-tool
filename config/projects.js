@@ -1,4 +1,4 @@
-const _currentProject = 'galiao' // string, 当前构建项目
+const _currentProject = 'store'; // string, 当前构建项目
 const ProjectsConfig = {
   example: {
     debug: false,
@@ -56,7 +56,19 @@ const ProjectsConfig = {
     browserSync: {
       open: false //停止自动打开浏览器
     }
+  },
+  huafei: {
+    debug: true,
+    autoprefixer: {
+      browsers: ['iOS >= 10']
+    },
+    revision: {
+      __open: false
+    }
   }
-}
+};
 
-module.exports = Object.assign({ _currentProject }, ProjectsConfig[_currentProject])
+module.exports = Object.assign(
+  { _currentProject },
+  ProjectsConfig[_currentProject]
+);

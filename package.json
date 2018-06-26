@@ -21,7 +21,7 @@
     "autoprefixer": "^7.1.6",
     "babel-core": "^6.26.0",
     "babel-preset-env": "^1.6.1",
-    "browser-sync": "^2.18.13",
+    "browser-sync": "^2.24.4",
     "cross-env": "^5.1.1",
     "cssnano": "^3.10.0",
     "gulp": "^3.9.1",
@@ -40,7 +40,7 @@
     "gulp-sourcemaps": "^2.6.1",
     "gulp-uglify": "^3.0.0",
     "imagemin-jpeg-recompress": "^5.1.0",
-    "imagemin-pngquant": "^5.0.1",
+    "imagemin-pngquant": "^5.1.0",
     "merge": "^1.2.0",
     "postcss-px2rem": "^0.3.0",
     "run-sequence": "^2.2.0"

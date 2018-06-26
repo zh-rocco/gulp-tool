@@ -1,0 +1,52 @@
+.sign-in-container {
+  margin: 0 auto;
+  width: 350px;
+  padding: 50px 20px 100px; }
+  .sign-in-container .field {
+    margin-bottom: 12px; }
+  .sign-in-container .input,
+  .sign-in-container .submit-btn {
+    display: block;
+    width: 100%;
+    height: 40px;
+    padding: 8px 16px;
+    border-radius: 2px;
+    outline: none;
+    font-size: 14px; }
+  .sign-in-container .input {
+    background-color: #fff;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    line-height: 24px;
+    color: #101920;
+    -webkit-appearance: none; }
+    .sign-in-container .input:hover {
+      border-color: rgba(0, 0, 0, 0.4); }
+    .sign-in-container .input:focus {
+      border-color: #eb0028; }
+  .sign-in-container .submit-btn {
+    position: relative;
+    background-color: #eb0028;
+    border: none;
+    color: #fff;
+    font-weight: 300;
+    text-align: center;
+    touch-action: manipulation;
+    white-space: nowrap;
+    -webkit-user-select: none;
+            user-select: none;
+    cursor: pointer;
+    z-index: 1;
+    overflow: hidden; }
+    .sign-in-container .submit-btn::before {
+      content: '';
+      position: absolute;
+      top: -1px;
+      left: -1px;
+      width: 0;
+      height: 100%;
+      background: #d70226;
+      -webkit-transition: width 0.3s;
+      transition: width 0.3s;
+      z-index: -1; }
+    .sign-in-container .submit-btn:hover::before {
+      width: 100%; }

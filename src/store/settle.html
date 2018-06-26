@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="shortcut icon" type="image/x-icon" href="./img/oneplus.ico">
+  <title>结算页</title>
+  <link rel="stylesheet" href="./css/main.css">
+  <link rel="stylesheet" href="./css/settle.css">
+</head>
+
+<body>
+  <header class="header">
+    <nav class="nav clear-fix">
+      <ul class="nav-pages clear-fix">
+        <li class="page">
+          <a href="./index.html">首页</a>
+        </li>
+        <li class="page">
+          <a class="relative" href="./cart.html">
+            <span>购物车</span>
+            <span id="$_CartCount" class="count">0</span>
+          </a>
+        </li>
+        <li class="page relative">
+          <a id="$_Login" href="./login.html">登录</a>
+          <ul class="dropdown-wrap">
+            <li class="dropdown-item">
+              <a id="$_Logout" href="javascript:;">退出</a>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </nav>
+  </header>
+
+  <main class="main">
+    <div class="order-container">
+      <form action="">
+        <div class="field">
+          <input class="input" id="$_Consignee" name="input-consignee" type="text" maxlength="60" placeholder="收货人" autocomplete="off"
+            autofocus="autofocus" autocorrect="off" autocapitalize="off" spellcheck="false" />
+        </div>
+
+        <div class="field">
+          <input class="input" id="$_Phone" name="input-phone" type="phone" maxlength="20" placeholder="手机" autocomplete="off" autofocus="autofocus"
+            autocorrect="off" autocapitalize="off" spellcheck="false" />
+        </div>
+
+        <div class="field">
+          <input class="input" id="$_Address" name="input-address" type="text" placeholder="收货地址" autocomplete="off" autofocus="autofocus"
+            autocorrect="off" autocapitalize="off" spellcheck="false" />
+        </div>
+
+        <button class="submit-btn" id="$_SubmitBtn">提交订单</button>
+      </form>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-tail">
+      <p class="copy-right">
+        <span>© 2018 All Rights Reserved.</span>
+      </p>
+    </div>
+  </footer>
+
+  <script src="./js/settle.js"></script>
+</body>
+
+</html>
