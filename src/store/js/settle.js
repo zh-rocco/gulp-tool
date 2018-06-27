@@ -94,7 +94,7 @@
 
         alert('下单成功');
         window.localStorage.removeItem('GOODS_LIST');
-        window.location.href = '/index.html';
+        window.location.href = './index.html';
       });
     },
 
@@ -103,7 +103,7 @@
       var $logout = document.getElementById('$_Logout');
       $logout.addEventListener('click', () => {
         window.localStorage.removeItem('USER_NAME');
-        window.location.href = '/login.html';
+        window.location.href = './login.html';
       });
     },
 

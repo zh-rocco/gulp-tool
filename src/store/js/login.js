@@ -20,7 +20,7 @@
       var userName = window.localStorage.getItem('USER_NAME');
       // 如果已登录，跳至首页
       if (userName) {
-        window.location.href = '/index.html';
+        window.location.href = './index.html';
       }
     },
 
@@ -83,7 +83,7 @@
 
         window.localStorage.setItem('USER_NAME', userName);
 
-        window.location.href = '/index.html';
+        window.location.href = './index.html';
       });
     }
   };
