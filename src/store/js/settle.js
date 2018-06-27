@@ -139,13 +139,13 @@
       var $totalGoodsNum = document.querySelector(
         '.total-panel .total-goods-num'
       );
-      var $allprice = document.querySelector('.total-panel .all-price');
+      var $allPrice = document.querySelector('.total-panel .all-price');
 
       $totalGoodsNum.textContent = this.cartGoodsCount;
-      var allprice = this.selectedGoods.reduce((prev, curr) => {
+      var allPrice = this.selectedGoods.reduce((prev, curr) => {
         return prev + curr.price * curr.count;
       }, 0);
-      $allprice.textContent = `¥ ${allprice.toFixed(2)}`;
+      $allPrice.textContent = `¥ ${allPrice.toFixed(2)}`;
     }
   };
 
