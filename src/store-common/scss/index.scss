@@ -1,0 +1,201 @@
+/* banner start */
+.banner {
+  height: 500px;
+  margin-bottom: 50px;
+  background: url('../img/index/oneplus-6-banner.jpg') no-repeat center;
+  background-size: auto 100%;
+  overflow: hidden;
+  cursor: pointer;
+
+  img {
+    opacity: 0;
+  }
+}
+/* banner end */
+
+/* goods start */
+.goods-wrap {
+  max-width: 1200px;
+  margin: 0 auto;
+  color: #333;
+}
+
+.goods-header {
+  margin-bottom: 10px;
+
+  h2 {
+    float: left;
+    font-size: 1.5em;
+    line-height: 1;
+  }
+
+  .sort-wrap {
+    float: right;
+    user-select: none;
+
+    a {
+      float: left;
+      height: 23px;
+      margin-left: -1px;
+      padding: 0 10px;
+      border: 1px solid #ccc;
+      background: #fff;
+      color: #333;
+      line-height: 23px;
+
+      &:hover {
+        border-color: #e4393c;
+        color: #e4393c;
+      }
+
+      &.active {
+        background: #e4393c;
+        color: #fff;
+        border-color: #e4393c;
+      }
+    }
+  }
+}
+
+.goods-list {
+  user-select: none;
+}
+
+.goods {
+  position: relative;
+  float: left;
+  width: 285px;
+  margin-top: 20px;
+  margin-right: 20px;
+  background: #fff;
+  font-size: 1em;
+  text-align: center;
+  transition: all 0.3s;
+
+  &:nth-of-type(4n) {
+    margin-right: 0;
+  }
+
+  &:hover {
+    box-shadow: 0 17px 50px 0 rgba(0, 0, 0, 0.19);
+    transform: translate3d(0, -2px, 0);
+    transition: all 0.3s cubic-bezier(0.55, 0, 0.1, 1);
+  }
+
+  a {
+    display: block;
+    padding: 50px 0;
+  }
+
+  img {
+    display: block;
+    width: 64.21053%;
+    max-width: 183px;
+    margin: 0 auto;
+  }
+
+  h3 {
+    line-height: 1.8;
+    margin: 20px 20px 8px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .buy-btn {
+    position: relative;
+    display: inline-block;
+    margin-top: 8px;
+    padding: 4px 6px;
+    background-color: #eb0028;
+    color: #fff;
+    line-height: 1;
+    border-radius: 2px;
+    transition: color 0.3s;
+    overflow: hidden;
+    cursor: pointer;
+    z-index: 1;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: -1px;
+      left: -1px;
+      width: 0;
+      height: 100%;
+      background: #d70226;
+      transition: width 0.3s;
+      z-index: -1;
+    }
+
+    &:hover::before {
+      width: 100%;
+    }
+  }
+
+  .sales {
+    position: absolute;
+    top: 8px;
+    right: 12px;
+    font-size: 12px;
+    color: #999;
+  }
+}
+/* goods end */
+
+/* service start */
+.service-wrap {
+  margin-top: 50px;
+  background-color: #fff;
+}
+
+.service-list {
+  width: 100%;
+  max-width: 1200px;
+  margin: auto;
+  color: #565b62;
+  font-size: 16px;
+  text-align: center;
+
+  li {
+    float: left;
+    width: 25%;
+    padding: 35px 0;
+  }
+
+  a {
+    display: block;
+  }
+
+  i {
+    display: inline-block;
+    height: 80px;
+    width: 80px;
+  }
+
+  span {
+    display: block;
+    padding-top: 15px;
+  }
+
+  .i-7d-return {
+    background: url(../img/index/icon-service.png) no-repeat;
+    background-position: 0 -920px;
+  }
+
+  .i-15d-return {
+    background: url(../img/index/icon-service.png) no-repeat;
+    background-position: 0 -640px;
+  }
+
+  .i-30d-swap {
+    background: url(../img/index/icon-service.png) no-repeat;
+    background-position: 0 -800px;
+  }
+
+  .i-free-send {
+    background: url(../img/index/icon-service.png) no-repeat;
+    background-position: 0 -1040px;
+  }
+}
+/* service end */
